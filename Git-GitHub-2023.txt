@@ -1,0 +1,181 @@
+
++++Proyecto de estudio de Git y GitHub 2023+++
+
+1º Instalar Git y configurar las variables globales:
+$ git config --global user.name "NombreUsuario"
+$ git config --global user.email "mi.email@gmail.com"
+
+2º Crear un directorio 
+$ mkdir Git-GitHub-2023
+
+3º Inicializando un repositorio en un directorio existente
+$ cd Git-GitHub-2023
+$ git init
+
+Nota: Si llama a la rama como: master
+se puede cambiar el nombre a la rama creada como:
+$git branch -m main (en lugar de master)
+
+También nos permite que se inicialice por defecto el nombre
+de todas las ramas para los proyectos nuevos:
+Utilizando:
+git config --global init.defaultBranch <name>
+
+Repaso comandos:
+$ git status
+$ git add helloWorld.txt
+$ git add .
+$ git commit -m "Este es mi primer commit"
+$ git checkout helloWorld.txt -> Recuperar el contenido del último commit del fichero y descartar los cambios.
+$ git reset -> Descartar todos los cambios actuales y restaurar al estado del último commit
+
+$ git log -> Listado de Commits
+$ git log --graph
+$ git log --graph --pretty=oneline
+$ git log --graph --decorate --all --oneline
+
+#Alias
+$ git config --global alias.tree = "log --graph --decorate --all --oneline" -> crear alias : tree
+$ git tree -> ejecutar alias tree (ejecuta: git log --graph --decorate --all --oneline)
+
+#git ignore
+$ touch .gitignore
+
+Nota: Añadir al fichero .gitignore
+**/DS_Store
+
+$ git add. .gitignore
+$ git commit -m "Se añade el .gitignore"
+$ git status
+
+git diff -> Resumen de cambios efectuados en los ficheros antes de hacer commit
+
+git checkout <hash> -> Navegar a un punto del control de versiones
+git checkout HEAD
+
+#Makigas...
+
+#Nota: *Si se nos ha olvidado meter algún cambio en el último commit
+git add index.html
+git commit --amend -> El último commit ahora incluye también los nuevos cambios en staging area
+
+#Deshacer cambios:
+
+EJEMPLO1 : git checkout -- <file>... -> Para descartar los cambios en el directorio de trabajo
+1º Ejemplo: borrar texto en un archivo que está en el repositorio
+2º Por tanto está modificado en el directorio de trabajo
+3º Ejecutar $ git checkout -- index.html -> Para descartar cambios en el directorio de trabajo
+
+EJEMPLO2 : git reset HEAD <file> -> Para descartar los cambios de staging area (to unstage)
+1º Ejemplo: borrar texto en un archivo que está en el repositorio
+2º Por tanto está modificado en el directorio de trabajo
+3º Ejecutar $ git add .
+4º Ejecutar $ git reset HEAD index.html -> Para descartar los cambios de staging area (to unstage)
+5º Ahora la modificación está en mi directorio de trabajo
+6º Ejecutar $ git checkout -- index.html -> Para descartar cambios en el directorio de trabajo
+
+#Deshacer contenido de un commit [reset|revert]
+#Ojo que el comando: git reset -> es un cambio destructivo
+
+EJEMPLO: git reset
+1º git log --oneline -> Para visualizar el listado de commit y buscar el hash de commit al que queremos volver
+2º Alguien en un commit ha borrado el texto de un fichero
+3º git reset f5f0388  -> Elimina los commits futuros para volver al hash seleccionado
+4º git status -> Se muestra el fichero como modificado: 'modified: index.html' en mi directorio de trabajo
+porque el contenido del fichero de mi directorio de trabajo contiene aún el fichero con el texto borrado
+para actualizar el texto borrado del repositorio en mi fichero del mi directorio de trabajo
+5º git checkout -- index.html
+
+EJEMPLO: git reset --hard <hash>
+1º Alguien en un commit ha borrado el texto de un fichero
+2º git reset --hard f5f0388  -> Elimina los commits futuros para volver al hash seleccionado
+3º git status -> Todo ok
+se ha sobreescrito el contenido del fichero del commit seleccionado también en mi directorio de trabajo y en el staging area
+
+EJEMPLO: git reset --soft <hash>
+1º Alguien en un commit ha borrado el texto de un fichero
+2º git reset --soft f5f0388  -> Elimina los commits futuros para volver al hash seleccionado
+3º git status -> Se muestra el fichero como modificado: 'modified: index.html' en el staging area
+se ha sobreescrito el contenido del fichero del commit seleccionado en mi directorio de trabajo y está pendiente en el staging area
+
+#Sintaxis HEAD
+Puntero al Commit que tenemos en revisión
+
+$ git log --oneline --decorate (el flag --decorate -> Visualiza los punteros de nuestro repositorio como (HEAD -> master)
+b4844be (HEAD -> master) Embellece el sitio web
+f5f0388 Indica que el sitio web está a punto de ser inaugurado
+ab18c91 Nueva plantilla de la página web
+...		...
+
+Podemos utilizar la en la sintaxis el nombre del puntero HEAD
+Por ejemplo: HEAD~1 -> Un commit antes de HEAD 
+Por ejemplo: HEAD~2 -> Dos commits antes de HEAD
+
+git diff HEAD~1 HEAD -> Compara el último commit HEAD, con su anterior
+
+#git revert 
+
+EJEMPLO: git revert (para deshacer un commit)
+Para deshacer un commit:
+b4844be (HEAD -> master) Embellece el sitio web
+f5f0388 Indica que el sitio web está a punto de ser inaugurado
+ab18c91 Nueva plantilla de la página web
+
+git revert b4844be (O también git revert HEAD) -> Se deshace el cambio revirtiendo las líneas del cambio mostradas en diff
+Ahora hacemos un commit para reflejar el cambio:
+1234567 Revert "Embellece el sitio web"
+
+
+EJEMPLO: git revert (para deshacer dos commits)
+Para deshacer dos commits:
+7d0829a (HEAD -> master) Blink, blink, blink
+b4844be Embellece el sitio web
+f5f0388 Indica que el sitio web está a punto de ser inaugurado
+ab18c91 Nueva plantilla de la página web
+
+#Una opción es replicar el procedimiento anterior:
+git revert 7d0829a
+git revert b4844be
+# ...pero entonces tendremos dos commits para revertir la situación
+# y desearíamos evitar esto
+d1f5d0a (HEAD -> master) Revert "Blink, blink, blink"
+6e060c0 Revert "Embellece el sitio web"
+7d0829a Blink, blink, blink
+b4844be Embellece el sitio web
+
+#Otra opción
+git revert --no-commit HEAD   -> Deshace el primer commit: HEAD, deja los cambios en staging area y no pide commit
+git revert --no-commit HEAD~1 -> Deshace el segundo commit: HEAD~1, deja los cambios en staging area y no pide commit
+# y ahora:
+# (all conflicts fixed: run "git revert --continue")
+# (use "git revert --abort" to cancel the revert operation)
+# Ejecutamos
+git revert --continue -> Nos pide comentario para el commit y se crea un único commit
+433f33d (HEAD -> master) Revert "Embellece el sitio web"
+7d0829a Blink, blink, blink
+b4844be Embellece el sitio web
+
+#Ramas
+$ git branch
+* main (old master) -> Rama activa y única rama actualmente
+
+$ git branch feature-newstyle -> Crea una nueva rama
+$ git branch 
+  feature-newstyle -> Rama creada
+  * main -> Rama activa
+
+#Cambiar de rama
+$ git checkout feature-newstyle
+
+#Crear una nueva rama y cambiarse a ella
+$ git checkout -b feature-newhomepage
+
+#Cambiar/Renombrar el nombre de una rama
+git branch -m feature-newhomepage feature-newhome
+
+#Borrar una rama
+git branch -d testing
+
+
+
+
