@@ -176,6 +176,67 @@ git branch -m feature-newhomepage feature-newhome
 #Borrar una rama
 git branch -d testing
 
+#Commits (18/01/2023)
+
+git log --oneline --decorate --all
+git log --oneline --decorate --all --graph
+
+#Fusiones-Merges: merge
+
+1º Partimos de:
+
+* 4c794ae (HEAD -> fix-fecha) Retrasar la apertura de la web
+* 433f33d (master) Revert "Embellece el sitio web"
+* 7d0829a Blink, Blink, Blink
+
+2º Queremos fusionar el commit 4c794ae, de la rama: fix-fecha con la rama master
+
+3º Ir a rama destino:
+$ git checkout master
+
+2º Indicar rama origen:
+$ git merge fix-fecha
+
+Por defecto, se utiliza la estrategia de Fast-forward
+*Tienes que hacer una fusión entre una rama que tiene modificaciones: fix-fecha
+y otra rama que no tiene modificaciones: master
+
+Para solucionar esta fusión, con  la estrategia Fast-forward
+Git mueve el puntero de la rama master apuntando al HEAD
+de esta forma la rama master ya tiene todos los commits anteriores más el nuevo fusionado.
+
+* 4c794ae (HEAD -> master, fix-fecha) Retrasar la apertura de la web
+* 433f33d Revert "Embellece el sitio web"
+* 7d0829a Blink, Blink, Blink
+
+
+*Estrategia de fusión recursiva
+
+* 4c794ae (HEAD -> master, fix-fecha) Retrasar la apertura de la web
+ * 214960d (feature-newstyle) Retoca el estilo de la página
+* 433f33d Revert "Embellece el sitio web"
+
+se utiliza cuando queremos fusionar cambios en dos ramas en las que ambas tienen cambios
+* 4c794ae (HEAD -> master) y * 214960d (feature-newstyle) 
+
+Nosotros tenemos que juntar cambios hechos en una rama con cambios hechos en la otra rama
+para ello crearemos un tercer commit
+en el que se integren los cambios hechos en ambas ramas
+En ambas ramas se han añadido y eliminado filas
+y Git intentará apliacar los cambios de la rama origen sobre la rama destino
+y si Git lo consigue automáticamente, se completará guardando el nuevo commit con los cambios.
+*Merge made by the 'recursive' stratagy
+
+* 1b660bf (HEAD -> master) Merge branch 'feature-newstyle'
+ * 214960d (feature-newstyle) Retoca el estilo de la página
+* 4c794ae (fix-fecha) Retrasar la apertura de la web
+* 433f33d Revert "Embellece el sitio web"
+
+#Conflictos (pendiente...)
+
+
+
+
 
 
 
