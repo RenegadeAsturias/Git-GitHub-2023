@@ -232,7 +232,189 @@ y si Git lo consigue automáticamente, se completará guardando el nuevo commit 
 * 4c794ae (fix-fecha) Retrasar la apertura de la web
 * 433f33d Revert "Embellece el sitio web"
 
-#Conflictos (pendiente...)
+#Alias
+Se guardan en la configuración de Git
+
+#Comando que queremos asignar a un alias
+$ git log --oneline --decorate --all --graph
+
+#Crear alias asignando a 'alias.lodag' el comando anterior
+$ git config --global alias.lodag 'log --oneline --decorate --all --graph'
+
+#Ejecutar el alias
+$ git lodag
+* 02e0665 (HEAD -> main, mejora-descripcion-proyecto) Mejora descripción proyecto
+* 38d25a1 Creación del proyecto
+
+#Si lo necesitamos se le pueden añadir más parámetros extras
+$ git lodag --graph --all
+
+#Otro ejemplo
+#Para eliminar un archivo del staging area, utilizamos la sintaxis: 
+use "git reset HEAD <file>..." to unstage
+
+#Crear alias asignando a 'alias.unstage' el comando anterior
+$ git config --global alias.unstage 'reset HEAD --'
+
+#Para hacer el unstage de un fichero index.html de un fichero que hemos subido por error al unstage.
+git unstage index.html
+
+#Para ver todos los alias
+git config --global --get-regexp alias
+
+#Para borrar un alias
+git config --global --unset alias.lodag
+
+
+#Resolver Conflictos ******************************************
+***************************************************************
+*************************************************************** .INICIO
+
+#Se ha producido un conflicto al intentar fusionar dos ramas: main y mejora-descripcion-proyecto
+
+Renegade@MiPC MINGW64 /c/proyectos/GitGitHub2023 (main)
+$ git merge mejora-descripcion-proyecto
+Auto-merging README.txt
+CONFLICT (content): Merge conflict in README.txt
+Automatic merge failed; fix conflicts and then commit the result.
+
+Renegade@MiPC MINGW64 /c/proyectos/GitGitHub2023 (main|MERGING)
+$
+
+#Para resolver el conflicto, abrimos el fichero donde Git ha detectado el conflicto
+#Nos encontraremos:
+
+<p>Prueba proyecto README!</p>
+
+<p>Proyecto de propósito educacional.</p>
+
+<<<<<<< HEAD
+        <p>Período 2023/2024</p>
+=======
+        <p>Año actual 2023</p>
+>>>>>>> mejora-descripcion-proyecto
+
+#En el detalle del conflicto que inicia por: 
+<<<<<<< + Commit vigente HEAD en la Rama destino main
+#Seguido del texto del fichero en la Rama destino main
+<p>Período 2023/2024</p>
+
+#Una separación para el conflicto, que representa:
+=======
+
+#En el detalle del conflicto que continúa por
+el texto del fichero de la rama origen
+<p>Año actual 2023</p>
+# Y Finaliza con 
+>>>>>>> mejora-descripcion-proyecto (Siendo mejora-descripcion-proyecto la rama origen)
+
+#PARA RESOLVER EL Conflictos
+Corregir manualmente el conflicto y dejar el código generado por Git
+el contenido que se espera que sea el definitivo.
+
+#**************************************************************************
+#Una vez resolvemos el conflicto Git nos indica las opciones: 
+
+Renegade@MiPC MINGW64 /c/proyectos/GitGitHub2023 (main|MERGING)
+$ git status
+On branch main
+You have unmerged paths.
+  (fix conflicts and run "git commit")
+  (use "git merge --abort" to abort the merge)
+
+Unmerged paths:
+  (use "git add <file>..." to mark resolution)
+        both modified:   README.txt
+
+no changes added to commit (use "git add" and/or "git commit -a")
+
+Renegade@MiPC MINGW64 /c/proyectos/GitGitHub2023 (main|MERGING)
+
+#Ejecutamos $ git add .
+
+Renegade@MiPC MINGW64 /c/proyectos/GitGitHub2023 (main|MERGING)
+$ git add .
+
+Renegade@MiPC MINGW64 /c/proyectos/GitGitHub2023 (main|MERGING)
+$ git status
+On branch main
+All conflicts fixed but you are still merging.
+  (use "git commit" to conclude merge)
+
+Changes to be committed:
+        modified:   README.txt
+
+#Y Ahora finalizamos con el commit correspondiente
+
+Renegade@MiPC MINGW64 /c/proyectos/GitGitHub2023 (main|MERGING)
+$ git commit -m "Conflicto resuelto"
+[main 5dfffc1] Conflicto resuelto
+
+#Todo OK
+
+*   5dfffc1 (HEAD -> main) Conflicto resuelto
+|\
+| * bb9f6b7 (mejora-descripcion-proyecto) Año actual 2023
+* | dcc7530 (fix-anio-vigente) Perído 2023/2024
+* | a385e3d Actualizado Año actual 2023
+|/
+* 02e0665 Mejora descripción proyecto
+* 38d25a1 Creación del proyecto
+
+#Resolver Conflictos ******************************************
+***************************************************************
+*************************************************************** .FIN
+
+#Tags/Etiquetas ***********************************************
+***************************************************************
+*************************************************************** .INICIO
+
+Los Tags sirven para identificar Commits particulares
+y que nos permita identificarlo mediante algún tipo de alias
+Un Commit que deseamos que pueda perdurar para utilizar como referencia
+o nos sirva para que nos permita volver facilmente.
+
+Crearemos un Tag, y se va a generar un alias asociado a ese Commit en particular
+
+El uso más normal de los Tags el etiquetar versiones de los proyectos
+
+#Creamos un Tag sobre la rama main
+$ git tag v0.2.0
+
+#Sobre el Commit HEAD, el último de mi repositorio, queda indicado el Tag creado
+Renegade@MiPC MINGW64 /c/proyectos/GitGitHub2023 (main)
+$ git lodag
+*   5dfffc1 (HEAD -> main, tag: v0.2.0) Conflicto resuelto
+|\
+| * bb9f6b7 (mejora-descripcion-proyecto) Año actual 2023
+* | dcc7530 (fix-anio-vigente) Perído 2023/2024
+* | a385e3d Actualizado Año actual 2023
+|/
+* 02e0665 Mejora descripción proyecto
+* 38d25a1 Creación del proyecto
+
+#Creamos un nuevo Tag para un commit concreto, por ejemplo:
+$ git tag v0.1.0 02e0665
+
+#Sobre el Commit indicado 02e0665, queda indicado el Tag creado
+* 02e0665 (tag: v0.1.0) Mejora descripción proyecto
+* 38d25a1 Creación del proyecto
+
+#Ahora utilizamos el Tag creado para hacer un checkout, en lugar de indicar el hash del commit
+$ git tag v.0.1.0
+
+#Visualizar un listado de Tags
+$ git tag
+v0.1.0
+v0.2.0
+
+#Ayuda de las opciones del comando
+$ git tag -h
+
+
+
+
+
 
 
 
