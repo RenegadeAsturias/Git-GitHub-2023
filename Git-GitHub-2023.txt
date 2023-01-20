@@ -365,7 +365,7 @@ $ git commit -m "Conflicto resuelto"
 ***************************************************************
 *************************************************************** .FIN
 
-#Tags/Etiquetas ***********************************************
+#Tags/Etiquetas (LIGEROS) *************************************
 ***************************************************************
 *************************************************************** .INICIO
 
@@ -411,14 +411,64 @@ v0.2.0
 #Ayuda de las opciones del comando
 $ git tag -h
 
+#Tags/Etiquetas (LIGEROS) *************************************
+***************************************************************
+*************************************************************** .FIN
 
+#Tags/Etiquetas (ANOTADOS) ************************************
+***************************************************************
+*************************************************************** .INICIO
 
+Los Tags Anotados son punteros + información
 
+Filtros de tags:
+$ git tag -l
+v0.1.0
+v0.2.0
 
+$ git tag -l "v0.1.*"
+v0.1.0
 
+$ git tag -l "v0.*.0"
+v0.1.0
+v0.2.0
 
+#Borramos los tags ligeros que tenemos:
+$ git tag -d v0.1.0 >> Deleted tag 'v0.1.0' (was 02e0665)
+$ git tag -d v0.2.0 >> Deleted tag 'v0.2.0' (was 5dfffc1)
 
+#Creamos un tag anotado (-a)
+$ git tag -a v.1.0 >> Nos pedirá un mensaje para el Tag
 
+Ejemplo:
+Primera versión del sitio web.
+*Los cambios que introducen esta versión son: xxxxxxxxxxxxxxxxxx
+*Los bugs que arreglan esta versión son: xxxxxxxxxxxxxxx
+
+$ git log...
+*   5dfffc1 (HEAD, tag: v0.1.0, main) Conflicto resuelto
+
+#Para ver los detalles de nuestro Tag anotada
+$ git show v0.1.0
+
+#También podemos utilizar el subcomando: show para ver detalles de main
+
+$ git show main
+
+commit 5dfffc11cc5b715b848b1d3f3ced968a98f611f6 (HEAD, tag: v0.1.0, main)
+Merge: dcc7530 bb9f6b7
+Author: XXXXXX <xxxxxx.xxxxxx@gmail.com>
+Date:   Thu Jan 19 00:33:54 2023 +0100
+... ...
+
+#También podemos utilizar el subcomando: show para ver detalles de commit
+
+$ git show 5dfffc11cc5b715b848b1d3f3ced968a98f611f6
+
+ommit 5dfffc11cc5b715b848b1d3f3ced968a98f611f6 (HEAD, tag: v0.1.0, main)
+Merge: dcc7530 bb9f6b7
+Author: XXXXXX <xxxxxx.xxxxxx@gmail.com>
+Date:   Thu Jan 19 00:33:54 2023 +0100
 
 
 
