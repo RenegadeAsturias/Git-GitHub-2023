@@ -530,8 +530,75 @@ Changes not staged for commit:
 
 Dropped refs/stash@{0} (404389dcf984bf79dc9d6d146f24aae82fca283c)
 
-#############################
-#Prueba: git push remote-git-github-2023 main
+
+################################################################
+
+#Remotos 2023
+
+#Actualmente para utilizar un remoto ya no se utiliza usuario/contraseña para iniciar una sesión
+#sino que se utiliza un token. Esto es así desde el 13 de agosto de 2021.
+
+#1º Vamos a generar un Token desde mi cuenta de GitHub
+#2º Ir a: Settings -> Developer Settings -> Personal Access Tokens
+#3º Generate new token > Introducir un nombre para el Token
+#4º Seleccionar un Expiration para el Token
+#5º En la sección de Select scopes seleccionar el check 'repo' si corresponde
+#6º Hacer clic en el botón 'Generate token'
+#7º Guardar el token generado porque no podrá ser visualizado nunca más.
+
+#Según la documentación de GitHub
+Using a token on the command line
+Once you have a token, you can enter it instead of your password when performing Git operations over HTTPS.
+For example, on the command line you would enter the following:
+
+$ git clone https://github.com/USERNAME/REPO.git
+Username: YOUR_USERNAME
+Password: YOUR_TOKEN
+
+#8º Añadiremos y configuramos un nuevo remoto:
+$ git remote set-url origin https://<Username>:<Token>@github.com/<user>/<repo>.git
+
+$ git remote set-url remote-git-github-2023 https://RenegadeAsturias:<Token>@github.com/RenegadeAsturias/Git-GitHub-2023.git
+
+#9º Ahora ya puedo actualizar mi repositorio remoto de GitHub
+$ git push remote-git-github-2023 main
+Enumerating objects: 5, done.
+Counting objects: 100% (5/5), done.
+Compressing objects: 100% (3/3), done.
+Writing objects: 100% (3/3), 372 bytes | 372.00 KiB/s, done.
+Total 3 (delta 1), reused 0 (delta 0), pack-reused 0
+remote: Resolving deltas: 100% (1/1), completed with 1 local object.
+To https://github.com/RenegadeAsturias/Git-GitHub-2023.git
+   f783001..a6df762  main -> main
+ 
+
+.......Continuamos.........
+
+#Para ver nuestra lista de remotos
+$ git remote
+remote-git-github-2023
+
+#Para subir nuestro repositorio a la nube escribimos
+#origin=nombre del remoto y main=nombre de la rama que queremos subir
+#en mi ejemplo origin=remote-git-github-2023
+
+$ git push <origin> main
+
+#Y si queremos subir todas las ramas de golpe si tenemos más de una
+$ git push <origin> --all
+
+#Para descargar un proyecto de GitHub a nuestro ordenador
+$ git clone https://github.com/RenegadeAsturias/Git-GitHub-2023.git
+
+#Hacemos un cambio sobre el repositorio, hacemos un commit y subimos el cambio a GitHub
+#utilizando el remoto creado y la rama que queremos subir
+$ git push remote-git-github-2023 main
+
+#Para descargarnos los cambios del proyecto de GitHub utlizamos
+$ git pull remote-git-github-2023 main
+
+
+
 
 
 
