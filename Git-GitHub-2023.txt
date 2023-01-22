@@ -614,5 +614,326 @@ Fast-forward
  1 file changed, 2 insertions(+)
 
 
+################################################################
+
+#A partir de los remotos tenemos más ramas:
+$ git branch --all
+* main
+  remotes/remote-git-github-2023/main
+
+#Así, cuando creamos el remoto, se nos creó también la rama:
+  remotes/remote-git-github-2023/main
+  
+#Eso es así, porque los remotos no son más que ramas
+#De hecho, podemos hacer esto, para cambiarnos de rama:
+
+$ git checkout remote-git-github-2023/main
+
+
+################################################################
+
+#El comando pull
+$ git pull remote-git-github-2023 main
+
+#es la combinación de dos comandos:
+
+#1º *** El primer comando es 'fetch'
+#que se conecta al remoto, comprueba si tiene cambios y se los descarga
+$ git fetch remote-git-github-2023
+
+#Ojo! que se los descarga sobre la rama remota: remote-git-github-2023
+#porque como vimos en el apartado anterior, el remoto también es una rama
+
+#2º *** El segundo comando es 'merge'
+#porque en realidad lo que se hace es una fusión entre los cambios de la rama remota
+#que se ha descargado con el comando fetch
+#con el contenido de la rama local de nuestro repositorio: main
+git merge remote-git-github-2023/main
+
+#Nota: Si a partir del comando fetch no se descargaron cambios porque no los encuentra
+#entonces no se fusionará nada a la rama del repositorio local.
+
+
+################################################################
+
+#Nos podemos encontrar en la siguiente situación que deberíamos tener en cuenta
+
+#Tenemos nuevos cambios sobre el repositorio remoto
+#quizás algún compañero haya estado subiendo nuevo código 
+#yo he estado desarrollando cambios nuevos y he hecho un commit en el repositorio local
+#por tanto tenemos cambios en ambas ramas: remota y local
+
+#Ahora cuando yo haga un:
+$ git pull remote-git-github-2023 main
+
+#Git utilizará la técnica recursiva para resolver esta incidencia
+#en lugar de la técnica de Fast-forward que se utilizaría si no hubiese cambios en la rama remota
+#esto nos exigirá crear un Commit temporal para resolver la fusión.
+
+#¿Cómo lo evitamos?
+
+#1º Forma de evitarlo, ejecutando un 'fetch' antes de hacer un commit
+#que se conecta al remoto, comprueba si tiene cambios y se los descarga:
+$ git fetch remote-git-github-2023
+
+
+#2º Forma de evitarlo, utlizar el parámetro a la hora de llamar a pull qu se llama 'rebase'
+$ git pull --rebase remote-git-github-2023 main
+
+#Utilizando esta estrategia de utilizar el parámetro --rebase
+#Git se encuentra en la misma situación que anteriormente
+#es decir, cambio en la rama local y cambio en la rama remota
+#pero ahora en lugar de utilizar una estrategia recursiva para solucionar el problema
+#tratará de reordenar por tiempo los commits de ambas ramas
+#y será capaz de solucionar el problema realizando una fusión sin necesidad un commit temporal.
+
+
+################################################################
+
+#Utilizando el comando rebase
+#Este comando reescribe el historial, es un comando destructivo y va alterar el historial
+#No hay que tocar el historial de cosas que hayan sido pusheadas
+#porque otros usuarios también tiene acceso a commits que dejarían de existir
+#Utilizarlo para cambios no pusheados
+
+#Contexto, partimos de nuestra rama main en la que tenemos nuestro trabajo:
+$ git log --oneline --decorate --all --graph
+* 5d8a4ec (HEAD -> main) Cambio tres
+* 5933cfb Cambio dos
+* a70e7b8 Cambio uno
+
+#Creamos una nueva rama y añadiremos nuevos cambios
+$ git checkout -b nueva-caracteristica
+Switched to a new branch 'nueva-caracteristica'
+
+#Añadimos nuevos cambios sobre la nueva rama: cambioA y cambioB
+$ git log --oneline --decorate --all --graph
+* efe5f58 (HEAD -> nueva-caracteristica) Cambio B
+* 0dc4ec1 Cambio A
+* 5d8a4ec (main) Cambio tres
+* 5933cfb Cambio dos
+* a70e7b8 Cambio uno
+
+#Ahora necesitamos cambiarnos otra vez a la rama main y añadimos un cambioC
+$ git log --oneline --decorate --all --graph
+* 165e0ee (HEAD -> main) Cambio C
+| * efe5f58 (nueva-caracteristica) Cambio B
+| * 0dc4ec1 Cambio A
+|/
+* 5d8a4ec Cambio tres
+* 5933cfb Cambio dos
+* a70e7b8 Cambio uno
+
+#Volvemos de nuevo a la rama nueva-caracteristica y añadimos un cambioD
+$ git log --oneline --decorate --all --graph
+* 80e4e35 (HEAD -> nueva-caracteristica) Cambio D
+* efe5f58 Cambio B
+* 0dc4ec1 Cambio A
+| * 165e0ee (main) Cambio C
+|/
+* 5d8a4ec Cambio tres
+* 5933cfb Cambio dos
+* a70e7b8 Cambio uno
+
+#Si ahora hiciésemos una fusión con un merge de ramas main y nueva-caracteristica
+#se resolvería con una estrategia recursiva
+#y tendríamos que solucionar la fusión con un commit temporal que no aporta nada
+
+#Recordatorio: Este comando reescribe el historial, es un comando destructivo y va alterar el historial
+#No hay que tocar el historial de cosas que hayan sido pusheadas
+#porque otros usuarios también tiene acceso a commits que dejarían de existir
+#Utilizarlo para cambios no pusheados
+
+#Queremos pedirle a Git que nos aplique los cambios de alguna otra forma
+#para que los cambios queden más ordenados
+#y la fusión se pueda resolver por la estrategia de FAST-FORWARD
+
+#1º En la rama que quiero integrar más adelante: nueva-caracteristica
+#ejecutamos:
+
+$ git rebase main
+Successfully rebased and updated refs/heads/nueva-caracteristica.
+
+#Todos los cambios han sido aplanados!!
+#Git modifica los punteros de anterior y siguiente de forma que quede plano
+#Esta es la parte destructiva del 'rebase' porque creado nuevos hashes para ello
+$ git log --oneline --decorate --all --graph
+* cdc2d18 (HEAD -> nueva-caracteristica) Cambio D
+* 2da8405 Cambio B
+* 5a38829 Cambio A
+* 165e0ee (main) Cambio C
+* 5d8a4ec Cambio tres
+* 5933cfb Cambio dos
+* a70e7b8 Cambio uno
+
+#Esto tiene la ventaja de que ahora vamos a la rama main
+$ git checkout main
+Switched to branch 'main'
+
+#Y fusionamos la rama main con la rama nueva-caracteristica
+#Y se resuelve con la estrategia de Fast-forward
+$ git merge nueva-caracteristica
+Updating 165e0ee..cdc2d18
+Fast-forward
+ cambioA | 0
+ cambioB | 0
+ cambioD | 0
+ 3 files changed, 0 insertions(+), 0 deletions(-)
+ create mode 100644 cambioA
+ create mode 100644 cambioB
+ create mode 100644 cambioD
+
+ 
+$ git log --oneline --decorate --all --graph
+* cdc2d18 (HEAD -> main, nueva-caracteristica) Cambio D
+* 2da8405 Cambio B
+* 5a38829 Cambio A
+* 165e0ee Cambio C
+* 5d8a4ec Cambio tres
+* 5933cfb Cambio dos
+* a70e7b8 Cambio uno
+
+
+################################################################
+
+#Rebase interactivo: reescribir el historial
+
+#Podemos cambiar el orden de los commits
+#Podemos modificar el mensaje de un commit previo
+#Podemos aplastar commits en un único commit
+
+#Recordar, que si cambiamos el historial también cambiamos sus hashes
+
+#¿Cómo hacer un rebase interactivo?
+
+#Vamos a intentar aplastar los commits
+#y que los commits: cambioA, cambioB, cambioC, cambioD, se queden en un único commit:
+$ git log --oneline --decorate --all --graph
+* cdc2d18 (HEAD -> main, nueva-caracteristica) Cambio D
+* 2da8405 Cambio B
+* 5a38829 Cambio A
+* 165e0ee Cambio C
+* 5d8a4ec Cambio tres
+* 5933cfb Cambio dos
+* a70e7b8 Cambio uno
+
+#1º Identificamos los commits sobre los que queremos aplicar, en este caso
+#estos cuatro:
+* cdc2d18 (HEAD -> main, nueva-caracteristica) Cambio D
+* 2da8405 Cambio B
+* 5a38829 Cambio A
+* 165e0ee Cambio C
+
+#2º Ejecutamos:
+$ git rebase -i HEAD~4
+
+#Se nos muestra en el editor, las siguientes opciones:
+
+pick 165e0ee Cambio C
+pick 5a38829 Cambio A
+pick 2da8405 Cambio B
+pick cdc2d18 Cambio D
+
+# Rebase 5d8a4ec..cdc2d18 onto 5d8a4ec (4 commands)
+#
+# Commands:
+# p, pick <commit> = use commit
+# r, reword <commit> = use commit, but edit the commit message
+# e, edit <commit> = use commit, but stop for amending
+# s, squash <commit> = use commit, but meld into previous commit
+# f, fixup [-C | -c] <commit> = like "squash" but keep only the previous
+#                    commit's log message, unless -C is used, in which case
+#                    keep only this commit's message; -c is same as -C but
+#                    opens the editor
+# x, exec <command> = run command (the rest of the line) using shell
+# b, break = stop here (continue rebase later with 'git rebase --continue')
+# d, drop <commit> = remove commit
+# l, label <label> = label current HEAD with a name
+# t, reset <label> = reset HEAD to a label
+# m, merge [-C <commit> | -c <commit>] <label> [# <oneline>]
+#         create a merge commit using the original merge commit's
+#         message (or the oneline, if no original merge commit was
+#         specified); use -c <commit> to reword the commit message
+# u, update-ref <ref> = track a placeholder for the <ref> to be updated
+#                       to this position in the new commits. The <ref> is
+#                       updated at the end of the rebase
+#
+# These lines can be re-ordered; they are executed from top to bottom.
+#
+# If you remove a line here THAT COMMIT WILL BE LOST.
+#
+# However, if you remove everything, the rebase will be aborted.
+#
+
+#3º Por ejemplo, vamos a cambiar el orden de los commits para que queden en orden
+#cambiamos las líneas pick del fichero del editor y guardamos
+
+Successfully rebased and updated refs/heads/main.
+
+#Y ahora se muestran ordenados pero ojo, que han cambiado los hashes
+* 31bc950 (HEAD -> main) Cambio D
+* 99e4f76 Cambio C
+* ccc4f80 Cambio B
+* 1220ef6 Cambio A
+
+#4º Por ejemplo, vamos a aplastar commits
+#supongamos que queremos cargarnos 3 de los commits
+#y que todos lo cambios queden en un único commit
+#Cambiamos las líneas del fichero, cambio los pick que quiero descartar por un squash
+#después de guardar, se nos pedirá un nuevo texto para el commit resultante
+#Ejecutamos:
+$ git rebase -i HEAD~4
+
+pick 1220ef6 Cambio A
+squash ccc4f80 Cambio B
+squash 99e4f76 Cambio C
+squash 31bc950 Cambio D
+
+#5º Después de guardar y cerrar el comando nos pedirá un nuevo texto para el commit resultante
+#Nos sugiere
+
+# This is a combination of 4 commits.
+# This is the 1st commit message:
+
+Cambio A
+
+# This is the commit message #2:
+
+Cambio B
+
+# This is the commit message #3:
+
+Cambio C
+
+# This is the commit message #4:
+
+Cambio D
+
+
+#6º Y dejamos como mensaje del commit global un mensaje genérico
+#Ejemplo:
+
+Cambios para la funcionalidad requerida
+
+$ git rebase -i HEAD~4
+[detached HEAD 151522f] Cambios para la funcionalidad requerida
+ Date: Sun Jan 22 20:48:02 2023 +0100
+ 4 files changed, 0 insertions(+), 0 deletions(-)
+ create mode 100644 cambioA
+ create mode 100644 cambioB
+ create mode 100644 cambioC
+ create mode 100644 cambioD
+Successfully rebased and updated refs/heads/main.
+
+#7º Se queda así:
+$ git log --oneline --all
+151522f (HEAD -> main) Cambios para la funcionalidad requerida
+cdc2d18 (nueva-caracteristica) Cambio D
+2da8405 Cambio B
+5a38829 Cambio A
+165e0ee Cambio C
+5d8a4ec Cambio tres
+5933cfb Cambio dos
+a70e7b8 Cambio uno
 
 
