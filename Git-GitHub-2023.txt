@@ -597,9 +597,21 @@ $ git push remote-git-github-2023 main
 #Para descargarnos los cambios del proyecto de GitHub utlizamos
 $ git pull remote-git-github-2023 main
 
+################################################################ Marca añadida desde el editor de GitHub para la prueba de git pull
 
-################################################################
-
+$ git pull remote-git-github-2023 main
+remote: Enumerating objects: 5, done.
+remote: Counting objects: 100% (5/5), done.
+remote: Compressing objects: 100% (3/3), done.
+remote: Total 3 (delta 1), reused 0 (delta 0), pack-reused 0
+Unpacking objects: 100% (3/3), 736 bytes | 7.00 KiB/s, done.
+From https://github.com/RenegadeAsturias/Git-GitHub-2023
+ * branch            main       -> FETCH_HEAD
+   19b7a7e..f76cc4c  main       -> remote-git-github-2023/main
+Updating 19b7a7e..f76cc4c
+Fast-forward
+ Git-GitHub-2023.txt | 2 ++
+ 1 file changed, 2 insertions(+)
 
 
 
